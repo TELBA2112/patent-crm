@@ -4,7 +4,7 @@ services:
     name: patent-api
     env: node
     buildCommand: cd server && npm install
-    startCommand: cd server && node index.js
+    startCommand: node server/index.js
     envVars:
       - key: MONGO_URI
         value: mongodb+srv://telba0702_db_user:UeVzOKi62XC2fOwZ@cluster0.dpwaron.mongodb.net/patent?retryWrites=true&w=majority
