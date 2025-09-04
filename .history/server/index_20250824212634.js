@@ -1,0 +1,220 @@
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const mongoose = require('mongoose');
+const app = express();
+
+// Middlewares
+app.use(cors());
+app.use(express.json({ limit: '10mb' })); // Increased limit for base64 images
+app.use(express.urlencoded({ extended: true }));
+
+// Routes
+console.log('✅ /api/auth routeri ro\'yxatdan o\'tkazildi');
+app.use('/api/auth', require('./routes/auth'));
+
+console.log('✅ /api/users routeri ro\'yxatdan o\'tkazildi');
+app.use('/api/users', require('./routes/users'));
+
+console.log('✅ /api/jobs routeri ro\'yxatdan o\'tkazildi');
+app.use('/api/jobs', require('./routes/jobs'));
+
+console.log('✅ /api/job-actions routeri ro\'yxatdan o\'tkazildi');
+app.use('/api/job-actions', require('./routes/jobActions'));
+
+// Default route
+app.get('/', (req, res) => {
+  res.send('Patent API Server ishlayapti!');
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('SERVER XATOSI:', err.stack);
+  res.status(500).json({ message: 'Server xatosi', error: err.message });
+});
+
+// Portni tekshirish funksiyasi
+const checkPortAvailable = (port) => {
+  return new Promise((resolve) => {
+    const server = require('net').createServer();
+    
+    server.once('error', () => {
+      // Port band
+      resolve(false);
+    });
+    
+    server.once('listening', () => {
+      // Port bo'sh
+      server.close();
+      resolve(true);
+    });
+    
+    server.listen(port);
+  });
+};
+
+// Serverni ishga tushirish
+// (Removed duplicate startServer definition and invocation)
+
+// Test endpointlari (autentifikatsiyasiz)
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'API ishlayapti!' });
+});
+
+app.get('/api/users-test', (req, res) => {
+  res.json([
+    { id: 'test1', username: 'admin', role: 'admin', firstName: 'Admin', lastName: 'User' },
+    { id: 'test2', username: 'operator1', role: 'operator', firstName: 'Operator', lastName: 'First' },
+    { id: 'test3', username: 'tekshiruvchi1', role: 'tekshiruvchi', firstName: 'Tekshiruvchi', lastName: 'User' }
+  ]);
+});
+
+app.post('/api/test-post', (req, res) => {
+  console.log('Test POST so\'rovi:', req.body);
+  res.status(201).json({ 
+    message: 'Test POST so\'rovi qabul qilindi',
+    receivedData: req.body,
+    id: 'test_' + Date.now() 
+  });
+});
+
+// Router modullarini import qilish
+const authRouter = require('./routes/auth');
+const usersRouter = require('./routes/users');
+const jobsRouter = require('./routes/jobs');
+const jobActionsRouter = require('./routes/jobActions');
+
+// Asosiy routerlar ro'yxati
+app.use('/api/auth', authRouter);
+console.log('✅ /api/auth routeri ro\'yxatdan o\'tkazildi');
+
+app.use('/api/users', usersRouter);
+console.log('✅ /api/users routeri ro\'yxatdan o\'tkazildi');
+
+app.use('/api/jobs', jobsRouter);
+console.log('✅ /api/jobs routeri ro\'yxatdan o\'tkazildi');
+
+// jobActions routerini tekshirish va to'g'ri ro'yxatdan o'tkazish
+app.use('/api/job-actions', jobActionsRouter);
+console.log('✅ /api/job-actions routeri ro\'yxatdan o\'tkazildi');
+
+// Admin maxsus endpointlari
+app.get('/api/admin/stats', require('./middleware/auth').authenticate, require('./middleware/auth').isAdmin, (req, res) => {
+  Promise.all([
+    mongoose.model('User').countDocuments(),
+    mongoose.model('Job').countDocuments(),
+    mongoose.model('Job').countDocuments({ status: 'yangi' }),
+    mongoose.model('Job').countDocuments({ status: 'bajarildi' })
+  ])
+  .then(([userCount, jobCount, newJobCount, completedJobCount]) => {
+    res.json({
+      users: userCount,
+      jobs: jobCount,
+      newJobs: newJobCount,
+      completedJobs: completedJobCount,
+      date: new Date()
+    });
+  })
+  .catch(err => {
+    console.error('Statistikani olishda xatolik:', err);
+    res.status(500).json({ error: 'Statistikani olishda xatolik' });
+  });
+});
+
+// Statik fayllar
+app.use('/uploads', express.static('uploads'));
+
+// 404 xatoligi
+app.use((req, res) => {
+  console.log(`404 xatoligi: ${req.method} ${req.url}`);
+  res.status(404).json({ message: 'Manba topilmadi', path: req.url, method: req.method });
+});
+
+// Xatolarni qayta ishlash
+app.use((err, req, res, next) => {
+  console.error('Server xatoligi:', err);
+  res.status(500).json({ message: 'Serverda ichki xatolik', error: err.message });
+});
+
+// Function to check if a port is available
+const isPortAvailable = (port) => {
+  return new Promise((resolve) => {
+    const tester = net.createServer()
+      .once('error', () => {
+        // Port is in use
+        resolve(false);
+      })
+      .once('listening', () => {
+        // Port is available
+        tester.close();
+        resolve(true);
+      })
+      .listen(port);
+  });
+};
+
+// Function to find an available port
+const findAvailablePort = async (preferredPort, alternativePorts = []) => {
+  // First try the preferred port
+  if (await isPortAvailable(preferredPort)) {
+    return preferredPort;
+  }
+  
+  // If preferred port is not available, try alternatives
+  for (const port of alternativePorts) {
+    if (await isPortAvailable(port)) {
+      return port;
+    }
+  }
+  
+  // If no ports are available, return null
+  return null;
+};
+
+// Modified server startup function to always use port 5000
+const startServer = async () => {
+  try {
+    // Try to connect to MongoDB first
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log('MongoDB ga ulanish muvaffaqiyatli o\'rnatildi');
+    
+    // Fixed port - always use 5000
+    const PORT = 5000;
+    
+    // Start server
+    app.listen(PORT, () => {
+      console.log(`\n✅ Server ${PORT} portda ishlayapti`);
+      console.log(`📡 API manzili: http://localhost:${PORT}\n`);
+    }).on('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        console.error(`\n⛔️ Xatolik: ${PORT} port allaqachon band.`);
+        console.log('\nPortni bo\'shatish uchun quyidagi amallarni bajarib ko\'ring:');
+        console.log('1. Quyidagi buyruq bilan 5000 portda ishlaydigan jarayonlarni ko\'ring:');
+        console.log('   sudo lsof -i :5000');
+        console.log('2. Jarayonni tugatish (PID - jarayon ID raqami):');
+        console.log('   kill -9 <PID>');
+        console.log('\nAgar Docker ishlatilayotgan bo\'lsa:');
+        console.log('1. docker ps - ishlab turgan konteynerlarni ko\'rish');
+        console.log('2. docker stop <CONTAINER_ID> - portni band qilgan konteynerni to\'xtatish\n');
+        process.exit(1);
+      } else {
+        console.error('Server ishga tushirishda xatolik:', err);
+        process.exit(1);
+      }
+    });
+  } catch (err) {
+    console.error('\n⛔️ MongoDB ga ulanishda xatolik:', err.message);
+    console.log('\nQuyidagi amallarni tekshiring:');
+    console.log('1. MongoDB serveri ishlaypti (local yoki Atlas)');
+    console.log('2. .env faylda MONGO_URI to\'g\'ri ko\'rsatilgan');
+    console.log('3. Internet ulanishi mavjud (Atlas uchun)\n');
+    process.exit(1);
+  }
+};
+
+// Start the server
+startServer();
+// Start the server
+startServer();
+// Start the server
+startServer();

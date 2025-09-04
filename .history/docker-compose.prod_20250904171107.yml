@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb
+    volumes:
+      - mongodb_data:/data/db
+    restart: always
+    networks:
+      - patent-network
+
+  server:
+    build: 
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: patent-server
+    ports:
+      - "5000:5000"
+    env_file: ./server/.env
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/patent-db
+      - NODE_ENV=production
+    depends_on:
+      - mongodb
+    volumes:
+      - ./server/uploads:/app/uploads
+    restart: always
+    networks:
+      - patent-network
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: patent-client
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+    restart: always
+    networks:
+      - patent-network
+
+networks:
+  patent-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:

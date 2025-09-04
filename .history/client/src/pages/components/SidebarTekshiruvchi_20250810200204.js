@@ -1,0 +1,29 @@
+import React from 'react';
+import './SidebarTekshiruvchi.css';
+
+function SidebarTekshiruvchi({ current, setCurrent, onLogout }) {
+  return (
+    <div className="sidebar">
+      <h2>🕵️‍♂️ Tekshiruvchi Panel</h2>
+      <ul>
+        <li className={current === 'profil' ? 'active' : ''} onClick={() => setCurrent('profil')}>
+          👤 Profil
+        </li>
+        <li className={current === 'brend' ? 'active' : ''} onClick={() => setCurrent('brend')}>
+          📄 Brend tekshirish
+        </li>
+        <li className={current === 'hujjatlar' ? 'active' : ''} onClick={() => setCurrent('hujjatlar')}>
+          📝 Topshirishga tayyor hujjatlar
+        </li>
+        <li className={current === 'yurist' ? 'active' : ''} onClick={() => setCurrent('yurist')}>
+          ⚖️ Yurist
+        </li>
+        <li onClick={onLogout}>
+          🚪 Chiqish
+        </li>
+      </ul>
+    </div>
+  );
+}
+
+export default SidebarTekshiruvchi;

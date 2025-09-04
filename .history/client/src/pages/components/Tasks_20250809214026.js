@@ -1,0 +1,356 @@
+import React, { useEffect, useState } from 'react';
+import './Tasks.css';
+
+function Tasks({ token }) {
+  const [tasks, setTasks] = useState([]);
+  const [form, setForm] = useState({
+    clientName: '',
+    clientSurname: '',
+    phone: '',
+    comments: '',
+    brandName: '',
+    status: 'yangi',
+    assignedTo: '',
+    personType: '', // <-- YANGI: shaxs turi
+  });
+  const [users, setUsers] = useState([]);
+  const [filter, setFilter] = useState({ status: '', assignedTo: '', search: '' });
+  const [editingTask, setEditingTask] = useState(null);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetchOperators();
+  }, []);
+
+  useEffect(() => {
+    fetchTasks();
+    // eslint-disable-next-line
+  }, [filter]);
+
+  const fetchTasks = async () => {
+    try {
+      let query = [];
+      if (filter.status) query.push(`status=${encodeURIComponent(filter.status)}`);
+      if (filter.assignedTo) query.push(`assignedTo=${encodeURIComponent(filter.assignedTo)}`);
+      if (filter.search) query.push(`search=${encodeURIComponent(filter.search)}`);
+      const queryString = query.length ? `?${query.join('&')}` : '';
+
+      const res = await fetch(`http://localhost:5000/api/jobs${queryString}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Server error: ${res.status} - ${text}`);
+      }
+
+      const data = await res.json();
+      setTasks(data);
+      setError('');
+    } catch (err) {
+      setError('Ishlarni yuklashda xatolik yuz berdi');
+      console.error(err);
+      setTasks([]);
+    }
+  };
+
+  const fetchOperators = async () => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/users?role=operator`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error('Operatorlarni yuklashda xatolik');
+      const data = await res.json();
+      setUsers(data);
+    } catch (err) {
+      console.error(err);
+      setUsers([]);
+    }
+  };
+
+  const handleInputChange = e => {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async e => {
+    e.preventDefault();
+
+    // MAJBURIY TEKSHIRUV — personType bo'sh bo'lmasin
+    if (!form.personType) {
+      setError("Iltimos, 'Shaxs turi'ni tanlang (yuridik yoki jismoniy).");
+      return;
+    }
+    if (!form.phone) {
+      setError('Telefon raqami majburiy');
+      return;
+    }
+    if (!form.brandName || !form.brandName.trim()) {
+      setError('Brand nomini kiriting');
+      return;
+    }
+
+    try {
+      const method = editingTask ? 'PUT' : 'POST';
+      const url = editingTask
+        ? `http://localhost:5000/api/jobs/${editingTask._id}`
+        : `http://localhost:5000/api/jobs`;
+
+      const jobPayload = {
+        clientName: form.clientName,
+        clientSurname: form.clientSurname,
+        phone: form.phone,
+        comments: form.comments,
+        brandName: form.brandName,
+        status: form.status,
+        personType: form.personType, // <-- yuborilmoqda
+      };
+      if (form.assignedTo) jobPayload.assignedTo = form.assignedTo;
+
+      const res = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(jobPayload),
+      });
+
+      const respData = await res.json();
+      if (!res.ok) {
+        setError(respData.message || 'Xatolik yuz berdi');
+        return;
+      }
+
+      await fetchTasks();
+      setForm({
+        clientName: '',
+        clientSurname: '',
+        phone: '',
+        comments: '',
+        brandName: '',
+        status: 'yangi',
+        assignedTo: '',
+        personType: '',
+      });
+      setEditingTask(null);
+      setError('');
+    } catch (err) {
+      setError('Server bilan bog‘lanishda xatolik');
+      console.error(err);
+    }
+  };
+
+  const handleEdit = task => {
+    setEditingTask(task);
+    setForm({
+      clientName: task.clientName || '',
+      clientSurname: task.clientSurname || '',
+      phone: task.phone,
+      comments: task.comments || '',
+      brandName: task.brandName || '',
+      status: task.status,
+      assignedTo: task.assignedTo ? task.assignedTo._id || task.assignedTo : '',
+      personType: task.personType || '',
+    });
+    setError('');
+  };
+
+  const handleDelete = async id => {
+    if (!window.confirm('Ishni o‘chirishni xohlaysizmi?')) return;
+    try {
+      const res = await fetch(`http://localhost:5000/api/jobs/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.message || 'O‘chirishda xatolik yuz berdi');
+        return;
+      }
+
+      await fetchTasks();
+      setError('');
+    } catch (err) {
+      setError('Server bilan bog‘lanishda xatolik');
+      console.error(err);
+    }
+  };
+
+  return (
+    <div className="tasks-container" style={{ padding: '20px', maxWidth: '900px', margin: 'auto' }}>
+      <h2>Ishlar ro‘yxati</h2>
+
+      <div style={{ marginBottom: '20px' }}>
+        <label>
+          Status:
+          <select name="status" value={filter.status} onChange={e => setFilter(prev => ({ ...prev, status: e.target.value }))}>
+            <option value="">Hammasi</option>
+            <option value="yangi">Yangi</option>
+            <option value="boglandi">Bog‘landi</option>
+            <option value="tekshiruvchi">Tekshiruvchi</option>
+            <option value="tugatilgan">Tugatilgan</option>
+          </select>
+        </label>
+
+        <label style={{ marginLeft: '10px' }}>
+          Operator:
+          <select name="assignedTo" value={filter.assignedTo} onChange={e => setFilter(prev => ({ ...prev, assignedTo: e.target.value }))}>
+            <option value="">Hammasi</option>
+            {users.map(user => (
+              <option key={user._id} value={user._id}>
+                {user.username}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label style={{ marginLeft: '10px' }}>
+          Qidirish:
+          <input
+            type="text"
+            name="search"
+            value={filter.search}
+            onChange={e => setFilter(prev => ({ ...prev, search: e.target.value }))}
+            placeholder="Telefon yoki ID"
+          />
+        </label>
+
+        <button onClick={fetchTasks} style={{ marginLeft: '10px' }}>
+          Qidirish
+        </button>
+      </div>
+
+      {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
+
+      <table border="1" cellPadding="8" style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>F.I.O</th>
+            <th>Telefon</th>
+            <th>Brend</th>
+            <th>Status</th>
+            <th>Operator</th>
+            <th>Izoh</th>
+            <th>Harakatlar</th>
+          </tr>
+        </thead>
+        <tbody>
+          {tasks.length === 0 ? (
+            <tr>
+              <td colSpan="8" style={{ textAlign: 'center' }}>
+                Ish topilmadi
+              </td>
+            </tr>
+          ) : (
+            tasks.map(task => (
+              <tr key={task._id}>
+                <td>{task.jobNo ? `No${task.jobNo}` : task._id?.slice(-5)}</td>
+                <td>{task.clientName} {task.clientSurname}</td>
+                <td>{task.phone}</td>
+                <td>{task.brandName}</td>
+                <td>{task.status}</td>
+                <td>{task.assignedTo?.username || '—'}</td>
+                <td>{task.comments}</td>
+                <td>
+                  <button onClick={() => handleEdit(task)}>Tahrirlash</button>{' '}
+                  <button onClick={() => handleDelete(task._id)}>O‘chirish</button>
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+
+      <h3 style={{ marginTop: '30px' }}>{editingTask ? 'Ishni tahrirlash' : 'Yangi ish qo‘shish'}</h3>
+      <form onSubmit={handleSubmit} style={{ marginTop: '10px' }}>
+        <input
+          type="text"
+          name="clientName"
+          placeholder="Ism"
+          value={form.clientName}
+          onChange={handleInputChange}
+        />{' '}
+        <input
+          type="text"
+          name="clientSurname"
+          placeholder="Familiya"
+          value={form.clientSurname}
+          onChange={handleInputChange}
+        />{' '}
+        <input
+          type="text"
+          name="phone"
+          placeholder="Telefon (majburiy)"
+          value={form.phone}
+          onChange={handleInputChange}
+          required
+        />{' '}
+        <input
+          type="text"
+          name="brandName"
+          placeholder="Brend"
+          value={form.brandName}
+          onChange={handleInputChange}
+        />{' '}
+        <input
+          type="text"
+          name="comments"
+          placeholder="Izoh"
+          value={form.comments}
+          onChange={handleInputChange}
+        />{' '}
+        <label>
+          Shaxs turi:
+          <select name="personType" value={form.personType} onChange={handleInputChange}>
+            <option value="">Tanlang</option>
+            <option value="yuridik">Yuridik</option>
+            <option value="jismoniy">Jismoniy</option>
+          </select>
+        </label>{' '}
+        <select name="status" value={form.status} onChange={handleInputChange}>
+          <option value="yangi">Yangi</option>
+          <option value="boglandi">Bog‘landi</option>
+          <option value="tekshiruvchi">Tekshiruvchi</option>
+          <option value="tugatilgan">Tugatilgan</option>
+        </select>{' '}
+        <select name="assignedTo" value={form.assignedTo} onChange={handleInputChange}>
+          <option value="">Operatorni tanlang</option>
+          {users.map(user => (
+            <option key={user._id} value={user._id}>
+              {user.username}
+            </option>
+          ))}
+        </select>{' '}
+        <button type="submit">{editingTask ? 'Saqlash' : 'Qo‘shish'}</button>
+        {editingTask && (
+          <button
+            type="button"
+            onClick={() => {
+              setEditingTask(null);
+              setForm({
+                clientName: '',
+                clientSurname: '',
+                phone: '',
+                comments: '',
+                brandName: '',
+                status: 'yangi',
+                assignedTo: '',
+                personType: '',
+              });
+              setError('');
+            }}
+          >
+            Bekor qilish
+          </button>
+        )}
+      </form>
+    </div>
+  );
+}
+
+export default Tasks;

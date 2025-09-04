@@ -1,0 +1,360 @@
+/* TekshiruvchiDashboard.css */
+
+.tekshiruvchi-wrapper {
+  display: flex;
+  min-height: 100vh;
+  background: #f4f7fb;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.tekshiruvchi-main {
+  flex: 1;
+  padding: 40px 48px;
+  background: #f4f6f8;
+  min-width: 0;
+  min-height: 100vh;
+}
+
+/* Dashboard ichidagi kontent uchun umumiy uslublar */
+.dashboard-content {
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+}
+
+/* Yangi qo'shilgan kompakt ko'rinish uslublari */
+.compact-view .info-columns {
+  display: flex;
+  gap: 20px;
+}
+
+/* Document grid view */
+.document-previews-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.document-preview-item {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 8px;
+  background: #fafafa;
+  transition: all 0.2s;
+}
+
+.document-preview-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.document-title {
+  font-size: 12px;
+  margin: 0 0 5px 0;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+.document-thumbnail-container {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.document-thumbnail {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  cursor: pointer;
+}
+
+.view-document-btn {
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.view-document-btn:hover {
+  background: #2980b9;
+}
+
+.compact-view .info-column {
+  flex: 1;
+}
+
+.compact-view .documents-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  max-width: 40%;
+}
+
+.document-images.compact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.document-image-container.compact {
+  flex-basis: calc(50% - 10px);
+  margin-bottom: 10px;
+}
+
+.document-thumbnail.small {
+  width: 70px;
+  height: 50px;
+  object-fit: cover;
+}
+
+.passport-thumbnails {
+  display: flex;
+  gap: 5px;
+}
+
+.task-list {
+  display: grid;
+  gap: 15px;
+}
+
+.task-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.task-item:hover {
+  background: #f9f9f9;
+  border-color: #2e8b57;
+}
+
+.task-item button {
+  background-color: #2e8b57;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.task-item button:hover {
+  background-color: #246d45;
+}
+
+/* Modal styling */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  width: 450px;
+  max-width: 90%;
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content h3 {
+  margin-top: 0;
+}
+
+.modal-content textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 10px;
+  margin: 15px 0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.modal-actions button {
+  padding: 10px 20px;
+  border: 1px solid #ccc;
+  background: #f0f0f0;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modal-actions button.active {
+  background: #2ecc71;
+  color: white;
+  border-color: #2ecc71;
+}
+
+.modal-footer button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 10px;
+  font-weight: bold;
+}
+
+.modal-footer button:first-child {
+  background: #2e8b57;
+  color: white;
+}
+
+.modal-footer button.cancel {
+  background: #ccc;
+  color: black;
+}
+
+/* Ko'rib chiqilgan ishlar uchun stillar */
+.approved-item {
+  border-left: 4px solid #52c41a;
+  background-color: #f6ffed;
+}
+
+.rejected-item {
+  border-left: 4px solid #ff4d4f;
+  background-color: #fff1f0;
+}
+
+.status-approved {
+  background-color: #f6ffed;
+  color: #52c41a;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 5px;
+  font-weight: 500;
+}
+
+.status-rejected, .status-returned_to_operator {
+  background-color: #fff1f0;
+  color: #ff4d4f;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 5px;
+  font-weight: 500;
+}
+
+.status-documents_pending {
+  background-color: #e6fffb;
+  color: #13c2c2;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 5px;
+  font-weight: 500;
+}
+
+/* Topshirishga tayyor hujjatlar uchun stillar */
+.documents-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.document-item {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.document-details {
+  margin-bottom: 20px;
+}
+
+.document-content {
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 15px;
+}
+
+.yuridik-details h5,
+.jismoniy-details h5 {
+  color: #2e8b57;
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.document-image {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.document-image img {
+  max-width: 200px;
+  max-height: 200px;
+  object-fit: contain;
+  border: 1px solid #ddd;
+  padding: 5px;
+  background: white;
+}
+
+.document-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.document-actions textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.approve-btn {
+  background: #52c41a;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  flex: 1;
+}
+
+.return-btn {
+  background: #fa8c16;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  flex: 1;
+}

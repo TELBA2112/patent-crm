@@ -1,0 +1,76 @@
+.tasks-container {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.task-form input,
+.task-form select,
+.task-form textarea {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 12px;
+  font-size: 16px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.task-form button {
+  background: #0077ff;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 5px;
+}
+
+.task-form button:hover {
+  background: #005fd1;
+}
+
+.filters {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+
+th {
+  background-color: #2980b9;
+  color: white;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+button {
+  margin: 0 3px;
+  padding: 5px 8px;
+  cursor: pointer;
+}
+
+.tasks-container input, 
+.tasks-container select {
+  margin: 5px 0;
+  padding: 5px;
+}
+
+.tasks-container button {
+  margin: 0 5px 5px 0;
+  padding: 5px 10px;
+  cursor: pointer;
+}
