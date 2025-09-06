@@ -1,0 +1,39 @@
+# Node dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+server/.env
+server/.env.*
+!server/.env.example
+
+# Editors/OS
+.vscode/
+.idea/
+.DS_Store
+
+# Build outputs
+dist/
+build/
+client/build/
+coverage/
+
+# Logs & PIDs
+*.log
+*.out.log
+*.pid
+logs/
+log/
+
+# Runtime uploads (kept out of Git)
+server/uploads/
+
+# Legacy and local-only packages
+.history/
+server-package/
