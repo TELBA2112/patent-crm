@@ -1,1 +1,42 @@
+# Repo root ignore rules
+
+# Node
+node_modules/
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environments
+.env
+.env.*
+!**/.env.example
+
+# IDE/OS
+.vscode/
+.idea/
+.DS_Store
+
+# Builds & coverage
+dist/
+build/
+**/build/
+coverage/
+
+# Logs & PIDs
+*.log
+*.out.log
+*.pid
+logs/
+log/
+**/*.log
+**/*.pid
+
+# Runtime uploads and artifacts
+**/uploads/
+
+# Local-only/legacy directories
+.history/
+server-package/
 node_modules
