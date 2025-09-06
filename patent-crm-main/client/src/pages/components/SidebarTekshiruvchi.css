@@ -1,0 +1,66 @@
+/* SidebarTekshiruvchi.css */
+
+.sidebar-tekshiruvchi {
+  width: 260px;
+  background: #2e8b57; /* Yashil rang toni */
+  color: #fff;
+  padding: 32px 0 0 0;
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.sidebar-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.sidebar-header h3 {
+  font-size: 1.5em;
+  margin: 0;
+  font-weight: 600;
+}
+
+.sidebar-nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1; /* Navigatsiya bo'limi bo'sh joyni to'ldirishi uchun */
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-nav li {
+  padding: 12px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-left: 4px solid transparent;
+  transition: all 0.3s;
+  color: #e0e0e0;
+}
+
+.sidebar-nav li:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.sidebar-nav li.active {
+  background: rgba(255, 255, 255, 0.2);
+  border-left: 4px solid white;
+  color: white;
+  font-weight: bold;
+}
+
+.logout-button {
+  margin-top: auto; /* Bu tugmani har doim pastda ushlab turadi */
+  background: #e74c3c; /* Qizil rang */
+  color: white;
+  text-align: center;
+  border-left: none !important;
+  font-weight: bold;
+}
+
+.logout-button:hover {
+  background: #c0392b; /* To'q qizil rang */
+}

@@ -1,0 +1,69 @@
+.App {
+  text-align: center;
+  background-color: #f5f7fa; /* ochiq fond */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.App-header {
+  background-color: #001529; /* quyuq ko‘k, professional header */
+  color: white;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between; /* chap va o‘ngni ajratadi */
+  align-items: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.App-header button {
+  background-color: #ff4d4f;
+  border: none;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.App-header button:hover {
+  background-color: #d9363e;
+}
+
+.App-content {
+  flex: 1; /* qolgan bo‘sh joyni to‘ldiradi */
+  padding: 30px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+h1, h2, h3 {
+  color: #001529;
+  margin-bottom: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+p {
+  color: #444;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .App-header {
+    flex-direction: column;
+    font-size: 1.2rem;
+  }
+  .App-header button {
+    margin-top: 10px;
+    width: 100%;
+  }
+  .App-content {
+    padding: 20px 10px;
+  }
+}
