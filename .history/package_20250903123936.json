@@ -1,7 +1,0 @@
-{
-  "name": "patent-workspace",
-  "private": true,
-  "scripts": {
-    "start": "bash ./run-all.sh"
-  }
-}
